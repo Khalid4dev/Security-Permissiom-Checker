@@ -38,10 +38,7 @@ compare_permissions() {
     fi
 }
 
-
-
-
-
+# Function to change permissions of a file
 Change_Perm() {
     local files=( "$@" )
     for file in $files; do
@@ -51,6 +48,7 @@ Change_Perm() {
     echo "done"
 }
 
+# Function to encrypt files
 Encrypt() {
     local files=( "$@" )
     echo $files
@@ -64,6 +62,7 @@ Encrypt() {
     done
 }
 
+# Function to decrypt files
 Decrypt(){
     local files=( "$@" )
     local password="${!#}"
@@ -80,9 +79,7 @@ Decrypt(){
     done
 }
 
-
-
-
+# Function to weaken permissions of files in a directory
 weaken(){
     dirs=$(find "$1" -type f)
     for file in $dirs;do
@@ -91,6 +88,20 @@ weaken(){
     echo "weaken done"
 }
 
-
-
-
+# FUnction Menu
+menu(){
+    echo "1. Compare Permissions"
+    echo "2. Change Permissions"
+    echo "3. Encrypt"
+    echo "4. Decrypt"
+    echo "5. Exit"
+    read -p "Enter your choice: " choice
+    case $choice in
+        1) compare_permissions ;;
+        2) Change_Perm ;;
+        3) Encrypt ;;
+        4) Decrypt ;;
+        5) exit ;;
+        *) echo "Invalid choice. Please try again." ;;
+    esac
+}
