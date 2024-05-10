@@ -40,7 +40,7 @@ compare_permissions() {
 
 # Function to change permissions of a file
 Change_Perm() {
-    local files=( "$@" )
+    local files=$(find "$1" -type f)
     for file in $files; do
         chmod o-xw "$file" && chmod g-xw "$file"
         echo "$file"
@@ -50,7 +50,11 @@ Change_Perm() {
 
 # Function to encrypt files
 Encrypt() {
-    local files=( "$@" )
+
+    read -p "entrez le chemin de votre dossier : " dir
+    
+    local files=$(find "$dir" -type f)
+
     echo $files
     local password="${!#}"
     for file in $files; do
@@ -64,7 +68,9 @@ Encrypt() {
 
 # Function to decrypt files
 Decrypt(){
-    local files=( "$@" )
+    read -p "entrez le chemin de votre dossier : " dir
+    
+    local files=$(find "$dir" -type f)
     local password="${!#}"
     for file in $files; do
         if [ -f "$file" ]; then
