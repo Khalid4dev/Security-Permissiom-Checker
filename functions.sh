@@ -40,7 +40,8 @@ compare_permissions() {
 
 # Function to change permissions of a file
 Change_Perm() {
-    local files=$(find "$1" -type f)
+    read -p "entrez le chemin de votre dossier : " dir
+    local files=$(find "$dir" -type f)
     for file in $files; do
         chmod o-xw "$file" && chmod g-xw "$file"
         echo "$file"
