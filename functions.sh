@@ -3,7 +3,7 @@
 
 
 # Function to check permissions of a file and return them
-check_permissions() {
+checkPermission() {
     file="$1"
     if [ ! -e "$file" ]; then
         echo "File '$file' does not exist."
@@ -27,8 +27,8 @@ compare_permissions() {
         echo "Please provide paths to both files."
         exit 1
     fi
-    permissions_file1=$(check_permissions "$file1")
-    permissions_file2=$(check_permissions "$file2")
+    permissions_file1=$(checkPermission "$file1")
+    permissions_file2=$(checkPermission "$file2")
     if [ "$permissions_file1" = "$permissions_file2" ]; then
         echo "Permissions are identical for both files."
     else
@@ -96,29 +96,112 @@ weaken(){
 }
 
 
+
 help() {
     echo "Usage: $0 [option]"
     echo "Options:"
-    echo "  -h              Display this help message"
-    echo "  -compare           Compare permissions of two files"
-    echo "  -change            Change permissions of files in a directory"
-    echo "  -encrypt           Encrypt files in a directory"
-    echo "  -decrypt           Decrypt files in a directory"
-    echo "  -weaken            Weaken permissions of files in a directory"
-    echo "  -menu              Display the interactive menu"
+    echo "  -h (help)          Display detailed documentation of the program"
+    echo "  -f (fork)          Allows execution by creating subprocesses with fork"
+    echo "  -t (thread)        Allows execution by threads"
+    echo "  -s (subshell)      Executes the program in a subshell"
+    echo "  -l (log)           Allows specifying a directory for storing the log file"
+    echo "  -r (restore)       Resets default settings, usable only by administrators"
     echo "Example:"
-    echo "  $0 -compare"
+    echo "  $0 -f"
 }
 
+# -f option
 
 fork_command() {
-    local command="$1"
-    "$command" &
-    echo "Forked process ID: $!"
+    file="$1"
+    if [ -z "$file" ]; then
+        echo "Please provide a file to monitor."
+        exit 1
+    fi
+    echo "Forking command: Monitoring permissions of $file"
+    while true; do
+        permissions=$(checkPermission "$file")
+        echo "Current permissions for $file: $permissions"
+        sleep 5
+    done
+}
+# -t option
+threadCommand() {
+    if [ $# -eq 0 ]; then
+        echo "Please provide at least one file to monitor."
+        exit 1
+    fi
+    trap 'kill $(jobs -p)' SIGINT
+    for file in "$@"; do
+        (
+            while true; do
+                permissions=$(checkPermission "$file")
+                echo "Current permissions for $file: $permissions"
+                sleep 5
+            done
+        ) &
+    done
+
+    # Wait for all background jobs to finish
+    wait
 }
 
+# -s option
 
-# FUnction Menu
+subshell_command() {
+    log_function_run
+    func=$1
+    shift
+    if [ -z "$func" ]; then
+        echo "Please provide a function to run in a subshell."
+        exit 1
+    fi
+    (
+        # Run the provided function in a subshell with all remaining arguments
+        $func "$@"
+    )
+}
+
+# Global variable for the log directory that can be set with the -l option
+
+# -l option
+log_command() {
+    dir="$1"
+    if [ -z "$dir" ]; then
+        echo "Please provide a directory for storing log files."
+        exit 1
+    fi
+    if [ "$dir" = "$LOG_DIR" ]; then
+        echo "Log directory is already set to $LOG_DIR"
+        return
+    fi
+    if [ ! -d "$dir" ]; then
+        echo "Directory '$dir' does not exist."
+        exit 1
+    fi
+    if [ ! -w "$dir" ]; then
+        echo "Directory '$dir' is not writable."
+        exit 1
+    fi
+    LOG_DIR="$dir"
+    echo "Log directory set to $LOG_DIR"
+}
+# -r option
+restore_command() {
+    if [ "$(id -u)" != "0" ]; then
+        echo "Sorry, you need to run this script as root."
+        exit 1
+    fi
+    # Add commands to restore default settings here
+    echo "Default settings restored."
+}
+#log function
+log_function_run() {
+    func=${FUNCNAME[1]} # Get the name of the calling function
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "$timestamp: $func was run" >> "$LOG_DIR/function_log.txt"
+}
+# Function Menu
 menu(){
     echo "1. Compare Permissions"
     echo "2. Change Permissions"
