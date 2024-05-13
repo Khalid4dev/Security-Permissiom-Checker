@@ -95,6 +95,21 @@ weaken(){
     echo "weaken done"
 }
 
+
+help() {
+    echo "Usage: $0 [option]"
+    echo "Options:"
+    echo "  -help              Display this help message"
+    echo "  -compare           Compare permissions of two files"
+    echo "  -change            Change permissions of files in a directory"
+    echo "  -encrypt           Encrypt files in a directory"
+    echo "  -decrypt           Decrypt files in a directory"
+    echo "  -weaken            Weaken permissions of files in a directory"
+    echo "  -menu              Display the interactive menu"
+    echo "Example:"
+    echo "  $0 -compare"
+}
+
 # FUnction Menu
 menu(){
     echo "1. Compare Permissions"
