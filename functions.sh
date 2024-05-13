@@ -99,7 +99,7 @@ weaken(){
 help() {
     echo "Usage: $0 [option]"
     echo "Options:"
-    echo "  -help              Display this help message"
+    echo "  -h              Display this help message"
     echo "  -compare           Compare permissions of two files"
     echo "  -change            Change permissions of files in a directory"
     echo "  -encrypt           Encrypt files in a directory"
@@ -109,6 +109,14 @@ help() {
     echo "Example:"
     echo "  $0 -compare"
 }
+
+
+fork_command() {
+    local command="$1"
+    "$command" &
+    echo "Forked process ID: $!"
+}
+
 
 # FUnction Menu
 menu(){
@@ -123,7 +131,9 @@ menu(){
         2) Change_Perm ;;
         3) Encrypt ;;
         4) Decrypt ;;
-        5) exit ;;
+        5) read -p "Enter command to fork: " command
+           fork_command "$command" ;;
+        6) exit ;;
         *) echo "Invalid choice. Please try again." ;;
     esac
 }
