@@ -5,6 +5,7 @@
 # Function to check permissions of a file and return them
 checkPermission() {
     file="$1"
+    
     if [ ! -e "$file" ]; then
         echo "File '$file' does not exist."
         exit 1
@@ -15,18 +16,40 @@ checkPermission() {
 
 
 check_vul(){
+    
     vulnerable_files=$(find "$1" -type f \( -perm -o=w -o -perm -o=x \))
     return $vulnerable_files
 }
 
 # Function to compare permissions between two files
 compare_permissions() {
-    read -p "Enter path to first file: " file1
-    read -p "Enter path to second file: " file2
-    if [ -z "$file1" ] || [ -z "$file2" ]; then
-        echo "Please provide paths to both files."
-        exit 1
+
+    if [ "$1" == "-h" ] ;then
+        echo "u just typed help"
+        exit 0
     fi
+   
+    while true; do
+        read -p "Enter path to first file: " file1
+        read -p "Enter path to second file: " file2
+
+        if [ -z "$file1" ] || [ -z "$file2" ]; then
+            echo "Please provide paths to both files."
+            continue
+        fi
+
+        if [ ! -e "$file1" ]; then
+            echo "First file does not exist. Please enter an existing file."
+            continue
+        fi
+
+        if [ ! -e "$file2" ]; then
+            echo "Second file does not exist. Please enter an existing file."
+            continue
+        fi
+
+        break
+    done
     permissions_file1=$(checkPermission "$file1")
     permissions_file2=$(checkPermission "$file2")
     if [ "$permissions_file1" = "$permissions_file2" ]; then
@@ -202,18 +225,24 @@ log_function_run() {
     echo "$timestamp: $func was run" >> "$LOG_DIR/function_log.txt"
 }
 # Function Menu
+
+
 menu(){
     echo "1. Compare Permissions"
     echo "2. Change Permissions"
     echo "3. Encrypt"
     echo "4. Decrypt"
     echo "5. Exit"
-    read -p "Enter your choice: " choice
+    read -p "Enter your choice: " input
+
+    choice=$(echo $input | awk '{print $1}')
+    args=$(echo $input | cut -d ' ' -f 2-)
+    
     case $choice in
-        1) compare_permissions ;;
-        2) Change_Perm ;;
-        3) Encrypt ;;
-        4) Decrypt ;;
+        1) compare_permissions $args ;;
+        2) Change_Perm $args ;;
+        3) Encrypt $args ;;
+        4) Decrypt $args ;;
         5) read -p "Enter command to fork: " command
            fork_command "$command" ;;
         6) exit ;;

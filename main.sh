@@ -23,7 +23,7 @@ case "$1" in
         restore_command
         ;;
     *)
-        menu
+        menu 
         ;;
     
 esac
