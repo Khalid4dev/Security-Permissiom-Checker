@@ -7,22 +7,8 @@ case "$1" in
         help
         exit 0
         ;;
-    -f)
-        fork_command "$2"
-        ;;
-    -t)
-        thread_command "${@:2}"
-        ;;
-    -s)
-        subshell_command "${@:2}"
-        ;;
-    -l)
-        log_command "$2"
-        ;;
-    -r)
-        restore_command
-        ;;
-    *)
+    *)  
+        help
         menu 
         ;;
     

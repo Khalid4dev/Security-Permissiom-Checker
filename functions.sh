@@ -1,14 +1,7 @@
 #!/bin/bash
 
 
-fork() {
-echo "$1"
-gcc -o prog prog.c
 
-echo "forking the command : "
-.prog.c "$1"
-
-}
 
 
 # Function to check permissions of a file and return them
@@ -32,12 +25,19 @@ check_vul(){
 
 # Function to compare permissions between two files
 compare_permissions() {
-
-    if [ "$1" == "-h" ]; then
+    case "$1" in
+    -h)
         echo "This function compares the permissions of two files."
         echo "You will be prompted to enter the paths of the two files to compare."
-        exit 0
-    fi
+        echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
+        exit 0;;
+    -f)
+        fork Change_Perm @a
+        exit 0;;
+    *)
+        echo "command not found"
+        exit 0;;
+    esac
    
     while true; do
         read -p "Enter path to first file: " file1
@@ -80,9 +80,11 @@ Change_Perm() {
     -h)
     echo "This function changes the permission of a all files in given directory."
         echo "You will be prompted to enter the paths of a directory."
+        echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
-        fork Change_Perm @a;;
+        fork Change_Perm @a
+        exit 0;;
     *)
         echo "command not found"
         exit 0
@@ -106,6 +108,19 @@ Change_Perm() {
 
 # Function to encrypt files
 Encrypt() {
+    case "$1" in
+    -h)
+    echo "This function changes the permission of a all files in given directory."
+        echo "You will be prompted to enter the paths of a directory."
+        echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
+        exit 0;;
+    -f)
+        fork Change_Perm @a
+        exit 0;;
+    *)
+        echo "command not found"
+        exit 0
+    esac
 
     read -p "entrez le chemin de votre dossier : " dir
     
@@ -124,6 +139,21 @@ Encrypt() {
 
 # Function to decrypt files
 Decrypt(){
+
+    case "$1" in
+    -h)
+    echo "This function changes the permission of a all files in given directory."
+        echo "You will be prompted to enter the paths of a directory."
+        echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
+        exit 0;;
+    -f)
+        fork Change_Perm @a
+        exit 0;;
+    *)
+        echo "command not found"
+        exit 0
+    esac
+
     read -p "entrez le chemin de votre dossier : " dir
     
     local files=$(find "$dir" -type f)
@@ -143,6 +173,7 @@ Decrypt(){
 
 # Function to weaken permissions of files in a directory
 weaken(){
+
     dirs=$(find "$1" -type f)
     for file in $dirs;do
     chmod o+xw $file
@@ -162,7 +193,7 @@ help() {
     echo "  -l (log)           Allows specifying a directory for storing the log file"
     echo "  -r (restore)       Resets default settings, usable only by administrators"
     echo "Example:"
-    echo "  $0 -f"
+    echo "  enc -f"
 }
 
 # -f option
@@ -260,11 +291,11 @@ log_function_run() {
 
 
 menu(){
-    echo "1. Compare Permissions"
-    echo "2. Change Permissions"
-    echo "3. Encrypt"
-    echo "4. Decrypt"
-    echo "5. Exit"
+    echo "cmpp. Compare Permissions"
+    echo "cp. Change Permissions"
+    echo "enc. Encrypt"
+    echo "dec. Decrypt"
+    echo "e. Exit"
     read -p "Enter your choice: " input
 
     choice=$(echo $input | awk '{print $1}')
@@ -274,10 +305,10 @@ menu(){
     
 
     case $choice in
-        1) compare_permissions $args ;;
-        2) Change_Perm $args ;;
-        3) Encrypt $args ;;
-        4) Decrypt $args ;;
+        cmpp) compare_permissions $args ;;
+        cp) Change_Perm $args ;;
+        enc) Encrypt $args ;;
+        dec) Decrypt $args ;;
         5) read -p "Enter command to fork: " command
            fork_command "$command" ;;
         6) exit ;;
