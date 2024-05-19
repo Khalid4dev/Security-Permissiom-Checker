@@ -1,6 +1,15 @@
 #!/bin/bash
 
 
+fork() {
+echo "$1"
+gcc -o prog prog.c
+
+echo "forking the command : "
+.prog.c "$1"
+
+}
+
 
 # Function to check permissions of a file and return them
 checkPermission() {
@@ -24,8 +33,9 @@ check_vul(){
 # Function to compare permissions between two files
 compare_permissions() {
 
-    if [ "$1" == "-h" ] ;then
-        echo "u just typed help"
+    if [ "$1" == "-h" ]; then
+        echo "This function compares the permissions of two files."
+        echo "You will be prompted to enter the paths of the two files to compare."
         exit 0
     fi
    
@@ -63,7 +73,29 @@ compare_permissions() {
 
 # Function to change permissions of a file
 Change_Perm() {
+
+   
+
+    case "$1" in
+    -h)
+    echo "This function changes the permission of a all files in given directory."
+        echo "You will be prompted to enter the paths of a directory."
+        exit 0;;
+    -f)
+        fork Change_Perm @a;;
+    *)
+        echo "command not found"
+        exit 0
+    esac
+
+
+    while true;do
     read -p "entrez le chemin de votre dossier : " dir
+    if [ ! -e "$dir" ];then
+        continue
+    fi
+    break
+    done
     local files=$(find "$dir" -type f)
     for file in $files; do
         chmod o-xw "$file" && chmod g-xw "$file"
@@ -238,6 +270,9 @@ menu(){
     choice=$(echo $input | awk '{print $1}')
     args=$(echo $input | cut -d ' ' -f 2-)
     
+
+    
+
     case $choice in
         1) compare_permissions $args ;;
         2) Change_Perm $args ;;
