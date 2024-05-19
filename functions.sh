@@ -1,7 +1,10 @@
 #!/bin/bash
 
 
-
+fork() {
+    echo "$1"
+    python3 -c "import subprocess; subprocess.run(['bash', '-c', '. \"$0\"; exec \"$@\"'])"
+}
 
 
 # Function to check permissions of a file and return them
@@ -32,11 +35,9 @@ compare_permissions() {
         echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
-        fork Change_Perm @a
+        fork "compare_permissions $@"
         exit 0;;
-    *)
-        echo "command not found"
-        exit 0;;
+  
     esac
    
     while true; do
@@ -83,11 +84,9 @@ Change_Perm() {
         echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
-        fork Change_Perm @a
+        fork "Change_Perm $@"
         exit 0;;
-    *)
-        echo "command not found"
-        exit 0
+    
     esac
 
 
@@ -110,16 +109,14 @@ Change_Perm() {
 Encrypt() {
     case "$1" in
     -h)
-    echo "This function changes the permission of a all files in given directory."
-        echo "You will be prompted to enter the paths of a directory."
+    echo "This function Encypts of a all files in given directory."
+        echo "You will be prompted to enter the path of a directory. and the wanted password"
         echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
         fork Change_Perm @a
         exit 0;;
-    *)
-        echo "command not found"
-        exit 0
+    
     esac
 
     read -p "entrez le chemin de votre dossier : " dir
@@ -142,16 +139,14 @@ Decrypt(){
 
     case "$1" in
     -h)
-    echo "This function changes the permission of a all files in given directory."
-        echo "You will be prompted to enter the paths of a directory."
+    echo "This function Decrypt of a all files in given directory."
+        echo "You will be prompted to enter the paths of a directory. and its password"
         echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
         fork Change_Perm @a
         exit 0;;
-    *)
-        echo "command not found"
-        exit 0
+   
     esac
 
     read -p "entrez le chemin de votre dossier : " dir
@@ -302,7 +297,7 @@ menu(){
     args=$(echo $input | cut -d ' ' -f 2-)
     
 
-    
+    echo $choice
 
     case $choice in
         cmpp) compare_permissions $args ;;

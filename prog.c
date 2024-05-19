@@ -21,7 +21,7 @@ int main(int argc, char *argv[]) {
         exit(1);
     } else {
         printf("Parent process. PID: %d\n", getpid());
-        wait(NULL);
+        
     }
 
     return 0;
