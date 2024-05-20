@@ -1,7 +1,6 @@
 #!/bin/bash
 
 fork(){
-    echo "$1"
     python3 -c "import subprocess; subprocess.run(['bash', '-c', '. \"$0\"; $1'])"
 }
 
@@ -32,7 +31,8 @@ compare_permissions() {
         exit 0;;
     -s)
         echo "<--Subshell-->"
-        subshellCommand;;
+        subshellCommand
+        exit 0;;
     
     esac
     while true; do
@@ -78,11 +78,12 @@ Change_Perm() {
         exit 0;;
     -f)
         shift # Move to the next argument after -f
-        fork "Encrypt $@"
+        fork "Change_Perm $@"
         exit 0;;
     -s)
         echo "<--Subshell-->"
-        subshellCommand;;
+        subshellCommand
+        exit 0;;
     esac
     while true; do
         read -p "Enter the directory path: " dir
@@ -115,7 +116,8 @@ Encrypt() {
         exit 0;;
     -s)
         echo "<--Subshell-->"
-        subshellCommand;;
+        subshellCommand
+        exit 0;;
     esac
 
     read -p "enter the path of the directory : " dir
@@ -148,7 +150,8 @@ Decrypt() {
         exit 0;;
     -s)
         echo "<--Subshell-->"
-        subshellCommand;;
+        subshellCommand
+        exit 0;;
     esac
     read -p "Enter the directory path: " dir
     local files=$(find "$dir" -type f)
@@ -220,15 +223,17 @@ show_log_dir() {
 }
 # -t option
 generate_threads() {
-    
+    echo "Starting generate_threads in PID $$"
     local command="$1"
-    local num_threads=4
+    local num_threads=2
     echo $command
     for ((i = 0; i < num_threads; i++)); do
         (
-            eval "$command"
+            eval "$command" &
+            echo "Started process with PID: $!"
         ) &
     done
+    echo "Finished generate_threads in PID $$"
 }
 # -r option
 restore_command() {
@@ -244,6 +249,10 @@ restore_command() {
     > "$LOG_DIR/log.txt"  # Clear the log file
     # Add commands to restore default settings here
     echo "Logs cleared."
+}
+#test function
+test_function() {
+    echo "This is a test function."
 }
 #log function
 log_function_run() {
@@ -268,11 +277,13 @@ while getopts ":hflr" opt; do
         r ) # Restore default settings
             restore_command
             ;;
+        t ) # Generate threads
+            generate_threads "$OPTARG"
+            ;;
         *)  echo "Invalid option: $OPTARG" 1>&2;;
     esac
 done
 shift $((OPTIND -1))
-
 
 
 
@@ -282,5 +293,6 @@ case "$1" in
     dec) Decrypt "${@:2}" ;;
     cmpp) compare_permissions "${@:2}" ;;
     cp) Change_Perm "${@:2}" ;;
+    test) test_function ;;
     
 esac
