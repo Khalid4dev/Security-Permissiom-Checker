@@ -21,14 +21,16 @@ checkPermission() {
 compare_permissions() {
     case "$1" in
     -h)
-    echo "This function Encypts of a all files in given directory."
-        echo "You will be prompted to enter the path of a directory. and the wanted password"
+     echo "This function compares the permissions of two files."
+        echo "You will be prompted to enter the paths of the two files to compare."
         echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
         shift # Move to the next argument after -f
         fork "compare_permissions $@"
         exit 0;;
+    
+
     
     esac
     while true; do
@@ -67,8 +69,8 @@ compare_permissions() {
 Change_Perm() {
     case "$1" in
     -h)
-    echo "This function Encypts of a all files in given directory."
-        echo "You will be prompted to enter the path of a directory. and the wanted password"
+    echo "This function changes the permission of a all files in given directory."
+        echo "You will be prompted to enter the paths of a directory."
         echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
@@ -108,7 +110,7 @@ Encrypt() {
     
     esac
 
-    read -p "entrez le chemin de votre dossier : " dir
+    read -p "enter the path of the directory : " dir
     
     local files=$(find "$dir" -type f)
 
@@ -127,8 +129,8 @@ Encrypt() {
 Decrypt() {
     case "$1" in
     -h)
-    echo "This function Encypts of a all files in given directory."
-        echo "You will be prompted to enter the path of a directory. and the wanted password"
+    echo "This function Decrypt all files in given directory."
+        echo "You will be prompted to enter the path of a directory. and the needed password"
         echo "-h shows help , -f to fork the command , -s run it in a subshell , -t to use threads"
         exit 0;;
     -f)
@@ -153,11 +155,8 @@ Decrypt() {
     done
 }
 
-# Parse command line arguments
-while getopts ":hf" opt; do
-    case ${opt} in
-        h ) # Display help message
-            echo "Usage: $0 [option]"
+help(){
+    echo "Usage: $0 [option]"
             echo "Options:"
             echo "  -h (help)          Display detailed documentation of the program"
             echo "  enc                Run the Encryption command"
@@ -167,9 +166,15 @@ while getopts ":hf" opt; do
             echo "Example:"
             echo "  enc -f"
             exit 0
+}
+
+# Parse command line arguments
+while getopts ":hf" opt; do
+    case ${opt} in
+        h ) # Display help message
+            help
             ;;
-       
-        \? ) echo "Invalid option: $OPTARG" 1>&2;;
+        *)  echo "Invalid option: $OPTARG" 1>&2;;
     esac
 done
 shift $((OPTIND -1))
@@ -181,12 +186,8 @@ if [ "$1" = "-f" ]; then
     exit 0
 fi
 
-# If no options are provided, show help
-# if [ $# -eq 0 ]; then
-#     echo "No options provided."
-    
-#     exit 1
-# fi
+
+
 
 # Otherwise, execute the specified function
 case "$1" in
