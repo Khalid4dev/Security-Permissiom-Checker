@@ -19,6 +19,7 @@ checkPermission() {
 
 # Function to compare permissions between two files
 compare_permissions() {
+    log_function_run
     case "$1" in
     -h)
      echo "This function compares the permissions of two files."
@@ -29,8 +30,9 @@ compare_permissions() {
         shift # Move to the next argument after -f
         fork "compare_permissions $@"
         exit 0;;
-    
-
+    -s)
+        echo "<--Subshell-->"
+        subshellCommand;;
     
     esac
     while true; do
@@ -67,6 +69,7 @@ compare_permissions() {
 
 # Function to change permissions of a file
 Change_Perm() {
+    log_function_run
     case "$1" in
     -h)
     echo "This function changes the permission of a all files in given directory."
@@ -77,7 +80,9 @@ Change_Perm() {
         shift # Move to the next argument after -f
         fork "Encrypt $@"
         exit 0;;
-    
+    -s)
+        echo "<--Subshell-->"
+        subshellCommand;;
     esac
     while true; do
         read -p "Enter the directory path: " dir
@@ -97,6 +102,7 @@ Change_Perm() {
 
 # Function to encrypt files
 Encrypt() {
+    log_function_run
     case "$1" in
     -h)
     echo "This function Encypts of a all files in given directory."
@@ -107,7 +113,9 @@ Encrypt() {
         shift # Move to the next argument after -f
         fork "Encrypt $@"
         exit 0;;
-    
+    -s)
+        echo "<--Subshell-->"
+        subshellCommand;;
     esac
 
     read -p "enter the path of the directory : " dir
@@ -127,6 +135,7 @@ Encrypt() {
 
 # Function to decrypt files
 Decrypt() {
+    log_function_run
     case "$1" in
     -h)
     echo "This function Decrypt all files in given directory."
@@ -137,7 +146,9 @@ Decrypt() {
         shift # Move to the next argument after -f
         fork "Decrypt $@"
         exit 0;;
-    
+    -s)
+        echo "<--Subshell-->"
+        subshellCommand;;
     esac
     read -p "Enter the directory path: " dir
     local files=$(find "$dir" -type f)
@@ -167,24 +178,100 @@ help(){
             echo "  enc -f"
             exit 0
 }
+# -s option
 
+subshellCommand() {
+    func=${FUNCNAME[1]} # Get the name of the calling function
+    shift
+    (
+        # Run the provided function in a subshell with all remaining arguments
+        $func "$@"
+    )
+}
+# -l option
+log_command() {
+    dir="$1"
+    if [ -z "$dir" ]; then
+        echo "Please provide a directory for storing log files."
+        exit 1
+    fi
+    if [ "$dir" = "$(cat logDirPath.txt 2>/dev/null)" ]; then
+        echo "Log directory is already set to $(cat logDirPath.txt)"
+        return
+    fi
+    if [ ! -d "$dir" ]; then
+        echo "Directory '$dir' does not exist."
+        exit 1
+    fi
+    if [ ! -w "$dir" ]; then
+        echo "Directory '$dir' is not writable."
+        exit 1
+    fi
+    echo "$dir" > logDirPath.txt  # Store the directory path in logDirPath.txt
+    echo "Log directory set to $(cat logDirPath.txt)"
+}
+#show the log directory
+show_log_dir() {
+    if [ ! -f logDirPath.txt ]; then
+        echo "Log directory is not set."
+        return
+    fi
+    echo "Log directory is set to $(cat logDirPath.txt)"
+}
+# -t option
+generate_threads() {
+    
+    local command="$1"
+    local num_threads=4
+    echo $command
+    for ((i = 0; i < num_threads; i++)); do
+        (
+            eval "$command"
+        ) &
+    done
+}
+# -r option
+restore_command() {
+    if [ "$(id -u)" != "0" ]; then
+        echo "Sorry, you need to run this script as root."
+        exit 1
+    fi
+    if [ ! -f logDirPath.txt ]; then
+        echo "Log directory is not set."
+        return
+    fi
+    LOG_DIR=$(cat logDirPath.txt)
+    > "$LOG_DIR/log.txt"  # Clear the log file
+    # Add commands to restore default settings here
+    echo "Logs cleared."
+}
+#log function
+log_function_run() {
+    if [ ! -f logDirPath.txt ]; then
+        echo "Log directory is not set."
+        return
+    fi
+    LOG_DIR=$(cat logDirPath.txt)
+    func=${FUNCNAME[1]} # Get the name of the calling function
+    timestamp=$(date +"%Y-%m-%d %H:%M:%S")
+    echo "$timestamp: $func was run" >> "$LOG_DIR/log.txt"
+}
 # Parse command line arguments
-while getopts ":hf" opt; do
+while getopts ":hflr" opt; do
     case ${opt} in
         h ) # Display help message
             help
+            ;;
+        l ) # Set log directory
+            log_command $2
+            ;;
+        r ) # Restore default settings
+            restore_command
             ;;
         *)  echo "Invalid option: $OPTARG" 1>&2;;
     esac
 done
 shift $((OPTIND -1))
-
-# If -f option is provided, then fork the command and exit
-if [ "$1" = "-f" ]; then
-    shift # Move to the next argument after -f
-    fork "$@"
-    exit 0
-fi
 
 
 
