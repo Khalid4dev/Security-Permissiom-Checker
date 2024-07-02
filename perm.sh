@@ -4,6 +4,9 @@ fork(){
     python3 -c "import subprocess; subprocess.run(['bash', '-c', '. \"$0\"; $1'])"
 }
 
+
+
+
 # Function to check permissions of a file and return them
 checkPermission() {
     file="$1"
@@ -230,10 +233,8 @@ generate_threads() {
     for ((i = 0; i < num_threads; i++)); do
         (
             eval "$command" &
-            echo "Started process with PID: $!"
         ) &
     done
-    echo "Finished generate_threads in PID $$"
 }
 # -r option
 restore_command() {
