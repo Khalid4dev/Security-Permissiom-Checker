@@ -92,5 +92,3 @@ Restore default settings and clear logs:
 ## Contributors
 Feel free to contribute by forking the repository and submitting pull requests.
 
-## License
-This project is licensed under the MIT License.
