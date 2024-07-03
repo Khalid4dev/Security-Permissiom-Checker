@@ -1,7 +1,3 @@
-Here's a README file tailored for your Bash script repository:
-
----
-
 # Bash Utility Scripts
 
 ## Overview
@@ -98,7 +94,3 @@ Feel free to contribute by forking the repository and submitting pull requests.
 
 ## License
 This project is licensed under the MIT License.
-
----
-
-This README file provides an overview of the repository, installation instructions, usage examples, and information about the script's features and options.
