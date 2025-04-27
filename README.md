@@ -1,4 +1,4 @@
-# Bash Utility Scripts
+# Security permission checker
 
 ## Overview
 This repository contains a collection of Bash utility scripts for file permission management, encryption, decryption, and logging. These scripts are designed to simplify common administrative tasks and provide flexible options for running commands in various environments.
